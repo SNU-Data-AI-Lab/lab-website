@@ -3,9 +3,29 @@
     {
       "name": "Sagad Hamid",
       "association": "University of Münster (Visiting PhD Student)"
+    },
+    {
+      "name": "Chaewoon Bae",
+      "association": "KAIST EE (Master's student)"
     }
   ],
   "undergraduate_interns": [
+    {
+      "name": "Junyeong Song",
+      "association": "KAIST EE (Winter 2024 - Fall 2025)"
+    },
+    {
+      "name": "Hojune Kim",
+      "association": "KAIST EE (Fall 2025)"
+    },
+    {
+      "name": "Donggeon Lee",
+      "association": "KAIST EE (Winter 2024 - Fall 2025)"
+    },
+    {
+      "name": "Yunsu Park",
+      "association": "University of Michigan (Summer 2025 - Fall 2025)"
+    },
     {
       "name": "Kyuho Lee",
       "association": "KAIST EE (Winter 2024 - Spring 2025)"

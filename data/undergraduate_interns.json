@@ -1,8 +1,4 @@
 [
   { "name": "Minho Jeong", "association": "KAIST EE" },
-  { "name": "Hak-Beom Kim", "association": "KAIST EE" },
-  { "name": "Junyeong Song", "association": "KAIST EE" },
-  { "name": "Donggeon Lee", "association": "KAIST EE" },
-  { "name": "Yunsu Park", "association": "University of Michigan" },
-  { "name": "Hojune Kim", "association": "KAIST EE" }
+  { "name": "Hak-Beom Kim", "association": "KAIST EE" }
 ]
