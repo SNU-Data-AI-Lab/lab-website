@@ -2,12 +2,19 @@
   {
     "year": "2026",
     "title": "PULSE: Socially-Aware User Representation Modeling Toward Parameter-Efficient Graph Collaborative Filtering",
-    "authors": ["Doyun Choi*", "Cheonwoo Lee*", "Biniyam Aschalew Tolera", "Taewook Ham", "Chanyoung Park", "Jaemin Yoo"],
+    "authors": [
+      "Doyun Choi*",
+      "Cheonwoo Lee*",
+      "Biniyam Aschalew Tolera",
+      "Taewook Ham",
+      "Chanyoung Park",
+      "Jaemin Yoo"
+    ],
     "is_lab_member": [true, true, true, true, false, true],
     "venue": "WWW 2026",
     "links": {
-      "paper": null,
-      "code": null,
+      "paper": "https://arxiv.org/pdf/2601.14720",
+      "code": "https://github.com/cdy9777/PULSE",
       "bib": null,
       "slides": null,
       "video": null,
@@ -18,7 +25,14 @@
   {
     "year": "2026",
     "title": "Feature-Centric Unsupervised Node Representation Learning Without Homophily Assumption",
-    "authors": ["Sunwoo Kim", "Soo Yong Lee", "Kyungho Kim", "Hyunjin Hwang", "Jaemin Yoo", "Kijung Shin"],
+    "authors": [
+      "Sunwoo Kim",
+      "Soo Yong Lee",
+      "Kyungho Kim",
+      "Hyunjin Hwang",
+      "Jaemin Yoo",
+      "Kijung Shin"
+    ],
     "is_lab_member": [false, false, false, false, true, false],
     "venue": "AAAI 2026",
     "links": {
