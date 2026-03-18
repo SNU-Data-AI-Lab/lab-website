@@ -16,6 +16,47 @@
     <link rel="icon" href="images/favicon.ico" type="image/x-icon" />
 
     <link rel="stylesheet" href="css/output.css" />
+    <style>
+      .alumni-count {
+        border-radius: 9999px;
+        background: #f3f4f6;
+        padding: 0.25rem 0.625rem;
+        font-size: 0.75rem;
+        font-weight: 500;
+        color: #6b7280;
+      }
+
+      .alumni-directory-row {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 0.25rem;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #e5e7eb;
+      }
+
+      .alumni-directory-row:last-child {
+        border-bottom: 0;
+      }
+
+      .alumni-directory-name {
+        font-weight: 500;
+        color: #111827;
+      }
+
+      .alumni-directory-association {
+        font-size: 0.875rem;
+        color: #6b7280;
+      }
+
+      @media (min-width: 640px) {
+        .alumni-directory-row {
+          grid-template-columns: minmax(0, 1fr) minmax(0, 0.95fr);
+          gap: 1.5rem;
+          padding: 0.75rem 0;
+          align-items: center;
+        }
+      }
+    </style>
   </head>
   <body class="bg-gray-50 text-gray-800">
     <script src="include-header-footer.js"></script>
@@ -152,7 +193,10 @@
               id="toggle-graduate-alumni"
               class="w-full p-3 sm:p-4 text-left flex items-center justify-between hover:bg-gray-200 transition-colors"
             >
-              <span class="text-lg font-semibold">Graduate Alumni</span>
+              <div class="flex items-center gap-3">
+                <span class="text-lg font-semibold">Graduate Alumni</span>
+                <span id="graduate-alumni-count" class="alumni-count"></span>
+              </div>
               <svg
                 id="graduate-arrow"
                 class="w-5 h-5 transform transition-transform"
@@ -168,17 +212,20 @@
                 ></path>
               </svg>
             </button>
-            <div
-              id="graduate-alumni-list"
-              class="hidden px-6 pb-4 space-y-2"
-            ></div>
+            <div id="graduate-alumni-list" class="hidden px-6 pb-4"></div>
           </div>
           <div class="border border-gray-200 rounded-lg">
             <button
               id="toggle-undergraduate-alumni"
               class="w-full p-3 sm:p-4 text-left flex items-center justify-between hover:bg-gray-200 transition-colors"
             >
-              <span class="text-lg font-semibold">Undergraduate Alumni</span>
+              <div class="flex items-center gap-3">
+                <span class="text-lg font-semibold">Undergraduate Alumni</span>
+                <span
+                  id="undergraduate-alumni-count"
+                  class="alumni-count"
+                ></span>
+              </div>
               <svg
                 id="undergraduate-arrow"
                 class="w-5 h-5 transform transition-transform"
@@ -196,7 +243,7 @@
             </button>
             <div
               id="undergraduate-alumni-list"
-              class="hidden px-6 pb-4 space-y-2"
+              class="hidden px-6 pb-4"
             ></div>
           </div>
         </div>
@@ -292,26 +339,41 @@
       fetch("data/alumni.json")
         .then((response) => response.json())
         .then((alumni) => {
+          const setupAccordion = (button, list, arrow) => {
+            button.addEventListener("click", () => {
+              list.classList.toggle("hidden");
+              arrow.classList.toggle("rotate-90");
+            });
+          };
+
+          const renderAlumniDirectory = (container, entries, countBadge) => {
+            container.innerHTML = "";
+            countBadge.textContent = `${entries.length}`;
+
+            entries.forEach(({ name, association }) => {
+              const item = document.createElement("div");
+              item.className = "alumni-directory-row";
+              item.innerHTML = `
+                <span class="alumni-directory-name">${name}</span>
+                <span class="alumni-directory-association">${association}</span>
+              `;
+              container.appendChild(item);
+            });
+          };
+
           // Graduate alumni
           const gradBtn = document.getElementById("toggle-graduate-alumni");
           const gradList = document.getElementById("graduate-alumni-list");
           const gradArrow = document.getElementById("graduate-arrow");
-          gradBtn.addEventListener("click", () => {
-            gradList.classList.toggle("hidden");
-            gradArrow.classList.toggle("rotate-90");
-          });
-          alumni.graduate_students.forEach(({ name, association }) => {
-            const item = document.createElement("div");
-            item.className =
-              "flex justify-between items-center py-2 border-b border-gray-200 last:border-b-0";
-            item.innerHTML = `
-              <span class="font-medium text-sm sm:text-md">${name}</span>
-              <span class="text-sm text-gray-600">${association}</span>
-            `;
-            gradList.appendChild(item);
-          });
+          const gradCount = document.getElementById("graduate-alumni-count");
+          setupAccordion(gradBtn, gradList, gradArrow);
+          renderAlumniDirectory(
+            gradList,
+            alumni.graduate_students,
+            gradCount
+          );
 
-          // Undergraduate alumni - grouped by year
+          // Undergraduate alumni
           const undergradBtn = document.getElementById(
             "toggle-undergraduate-alumni"
           );
@@ -319,97 +381,15 @@
             "undergraduate-alumni-list"
           );
           const undergradArrow = document.getElementById("undergraduate-arrow");
-          undergradBtn.addEventListener("click", () => {
-            undergradList.classList.toggle("hidden");
-            undergradArrow.classList.toggle("rotate-90");
-          });
-
-          // Group by end year
-          const groupedByYear = {};
-          alumni.undergraduate_interns.forEach(({ name, association }) => {
-            // Extract period from association
-            const match = association.match(/\(([^)]+)\)$/);
-            const period = match ? match[1] : "Unknown";
-
-            // Extract association without period
-            const assocWithoutPeriod = association
-              .replace(/\([^)]+\)$/, "")
-              .trim();
-
-            // Get end year from period
-            const endYear = getEndYear(period);
-
-            if (!groupedByYear[endYear]) {
-              groupedByYear[endYear] = [];
-            }
-            groupedByYear[endYear].push({
-              name,
-              association: assocWithoutPeriod,
-              period,
-            });
-          });
-
-          // Function to extract end year from period
-          function getEndYear(period) {
-            // Handle ranges like "Summer 2024 - Fall 2024"
-            if (period.includes(" - ")) {
-              const endPeriod = period.split(" - ")[1].trim();
-              const yearMatch = endPeriod.match(/(\d{4})/);
-              return yearMatch ? yearMatch[1] : "Unknown";
-            } else {
-              // Single period like "Spring 2024"
-              const yearMatch = period.match(/(\d{4})/);
-              return yearMatch ? yearMatch[1] : "Unknown";
-            }
-          }
-
-          // Sort years in descending order
-          const sortedYears = Object.keys(groupedByYear).sort((a, b) => {
-            if (a === "Unknown") return 1;
-            if (b === "Unknown") return -1;
-            return parseInt(b) - parseInt(a);
-          });
-
-          sortedYears.forEach((year) => {
-            const yearDiv = document.createElement("div");
-            yearDiv.className = "border border-gray-200 rounded mb-2";
-
-            const yearButton = document.createElement("button");
-            yearButton.className =
-              "w-full px-4 py-2 text-left flex items-center justify-between hover:bg-gray-50 transition-colors";
-            yearButton.innerHTML = `
-              <span class="font-medium text-gray-700">${year}</span>
-              <svg class="year-arrow w-4 h-4 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-              </svg>
-            `;
-
-            const yearContent = document.createElement("div");
-            yearContent.className = "hidden px-4 pb-2 space-y-1";
-
-            groupedByYear[year].forEach(({ name, association, period }) => {
-              const item = document.createElement("div");
-              item.className =
-                "grid grid-cols-3 gap-4 py-2 text-sm border-b border-gray-50 last:border-b-0";
-              item.innerHTML = `
-                <span class="font-medium">${name}</span>
-                <span class="text-gray-600">${association}</span>
-                <span class="text-gray-500 text-xs">${period}</span>
-              `;
-              yearContent.appendChild(item);
-            });
-
-            yearButton.addEventListener("click", () => {
-              yearContent.classList.toggle("hidden");
-              yearButton
-                .querySelector(".year-arrow")
-                .classList.toggle("rotate-90");
-            });
-
-            yearDiv.appendChild(yearButton);
-            yearDiv.appendChild(yearContent);
-            undergradList.appendChild(yearDiv);
-          });
+          const undergradCount = document.getElementById(
+            "undergraduate-alumni-count"
+          );
+          setupAccordion(undergradBtn, undergradList, undergradArrow);
+          renderAlumniDirectory(
+            undergradList,
+            alumni.undergraduate_interns,
+            undergradCount
+          );
         });
     </script>
   </body>
