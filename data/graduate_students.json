@@ -40,14 +40,6 @@
     "homepage": ""
   },
   {
-    "name": "Chaewoon Bae",
-    "role": "Master's Student",
-    "image": "images/chaewoon.jpg",
-    "research": "Graph and hypergraph learning",
-    "email": "cw1203@kaist.ac.kr",
-    "homepage": "https://chaewoonbae.github.io/"
-  },
-  {
     "name": "Dooho Lee",
     "role": "Master's Student",
     "image": "images/dooho.jpg",
@@ -61,7 +53,7 @@
     "image": "images/akotet.jpg",
     "research": "GNNs, Recommender Systems",
     "email": "tesema.akotet@kaist.ac.kr",
-    "homepage": "https://akotet.super.site/"
+    "homepage": "https://akotet08.github.io/"
   },
   {
     "name": "Biniyam Aschalew",
@@ -90,5 +82,19 @@
     "image": "images/jongbok.png",
     "research": "Fairness in graph recommendation system",
     "email": "ljbassa@kaist.ac.kr"
+  },
+  {
+    "name": "Minho Jeong",
+    "role": "Master's Student",
+    "image": "images/minho.jpeg",
+    "research": "Tabular Foundation Models, Graph Neural Networks",
+    "email": "minho.jeong@snu.ac.kr"
+  },
+  {
+    "name": "Hak-Beom Kim",
+    "role": "Master's Student",
+    "image": "images/hakbeom.jpeg",
+    "research": "Recommendation Systems",
+    "email": "gradschool7515@snu.ac.kr"
   }
 ]
