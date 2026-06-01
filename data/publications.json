@@ -1,6 +1,111 @@
 [
   {
     "year": "2026",
+    "title": "A Probabilistic Circuit Framework for Interpretable Graph PU Learning",
+    "authors": [
+      "Sagad Hamid",
+      "Dooho Lee",
+      "Myeong Kong",
+      "Tanya Braun",
+      "Jaemin Yoo"
+    ],
+    "is_lab_member": [false, true, true, false, true],
+    "venue": "UAI 2026",
+    "links": {
+      "paper": null,
+      "code": null,
+      "bib": null,
+      "slides": null,
+      "video": null,
+      "web": null,
+      "poster": null
+    }
+  },
+  {
+    "year": "2026",
+    "title": "Node4All: Learning Node Representation Beyond Datasets",
+    "authors": [
+      "Dooho Lee",
+      "Jaemin Yoo"
+    ],
+    "is_lab_member": [true, true],
+    "venue": "KDD 2026",
+    "links": {
+      "paper": null,
+      "code": null,
+      "bib": null,
+      "slides": null,
+      "video": null,
+      "web": null,
+      "poster": null
+    }
+  },
+  {
+    "year": "2026",
+    "title": "Generalizing Multi-Scale Time-Series Modeling with a Single Operator",
+    "authors": [
+      "Cheonwoo Lee",
+      "Dooho Lee",
+      "Doyun Choi",
+      "Jaemin Yoo"
+    ],
+    "is_lab_member": [true, true, true, true],
+    "venue": "ICML 2026",
+    "links": {
+      "paper": null,
+      "code": null,
+      "bib": null,
+      "slides": null,
+      "video": null,
+      "web": null,
+      "poster": null
+    }
+  },
+  {
+    "year": "2026",
+    "title": "View Space: Learning Representation across Arbitrary Graphs",
+    "authors": [
+      "Dooho Lee",
+      "Myeong Kong",
+      "Minho Jeong",
+      "Jaemin Yoo"
+    ],
+    "is_lab_member": [true, true, true, true],
+    "venue": "ICML 2026",
+    "links": {
+      "paper": "https://arxiv.org/pdf/2512.11561",
+      "code": "https://github.com/dooho00/graph-view-space",
+      "bib": null,
+      "slides": null,
+      "video": null,
+      "web": null,
+      "poster": null
+    }
+  },
+  {
+    "year": "2026",
+    "title": "ItemRAG: Item-Based Retrieval-Augmented Generation for LLM-Based Recommendation",
+    "authors": [
+      "Sunwoo Kim",
+      "Geon Lee",
+      "Kyungho Kim",
+      "Jaemin Yoo",
+      "Kijung Shin"
+    ],
+    "is_lab_member": [false, false, false, true, false],
+    "venue": "SIGIR 2026 (Short Paper)",
+    "links": {
+      "paper": "https://arxiv.org/pdf/2511.15141",
+      "code": "https://github.com/kswoo97/ItemRAG",
+      "bib": null,
+      "slides": null,
+      "video": null,
+      "web": null,
+      "poster": null
+    }
+  }, 
+  {
+    "year": "2026",
     "title": "PULSE: Socially-Aware User Representation Modeling Toward Parameter-Efficient Graph Collaborative Filtering",
     "authors": [
       "Doyun Choi*",
@@ -11,7 +116,7 @@
       "Jaemin Yoo"
     ],
     "is_lab_member": [true, true, true, true, false, true],
-    "venue": "WWW 2026",
+    "venue": "WWW 2026, oral presentation (top 9.4%, 317 of 3370 submissions)",
     "links": {
       "paper": "https://arxiv.org/pdf/2601.14720",
       "code": "https://github.com/cdy9777/PULSE",
