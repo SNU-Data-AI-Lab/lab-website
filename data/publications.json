@@ -31,8 +31,8 @@
     "is_lab_member": [true, true],
     "venue": "KDD 2026",
     "links": {
-      "paper": null,
-      "code": null,
+      "paper": "http://arxiv.org/abs/2607.17272",
+      "code": "https://github.com/dooho00/node4all",
       "bib": null,
       "slides": null,
       "video": null,
