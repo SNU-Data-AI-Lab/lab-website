@@ -1,5 +1,15 @@
 {
+  "postdoctoral_researchers": [
+    {
+      "name" : "AIKTA ARYA",
+      "association" : ""
+    }
+  ],
   "graduate_students": [
+    {
+      "name": "Cheonwoo Lee",
+      "association": "KAIST EE"
+    },
     {
       "name": "Sagad Hamid",
       "association": "University of Münster (Visiting PhD Student)"

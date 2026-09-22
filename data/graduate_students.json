@@ -11,17 +11,17 @@
     "name": "Jinmo Lee",
     "role": "Ph.D. Student",
     "image": "images/jinmo.jpg",
-    "research": "Heterogeneous graph neural networks",
-    "email": "jml2529@kaist.ac.kr",
+    "research": "Tabular Foundation Models",
+    "email": "jinmo.lee@snu.ac.kr",
     "homepage": "https://morcellinus.github.io/"
   },
   {
-    "name": "Cheonwoo Lee",
-    "role": "Master's Student",
-    "image": "images/cheonwoo.jpg",
-    "research": "Machine learning on irregular time series",
-    "email": "cheonwoo.lee@kaist.ac.kr",
-    "homepage": "https://cheonwoolee.github.io/"
+    "name": "Jiwon Seo",
+    "role": "Ph.D. Student",
+    "image": "images/Jiwon.jpg",
+    "research": "Time Series Analysis, Anomaly Detection",
+    "email": "jiwon.seo@snu.ac.kr",
+    "homepage": "" 
   },
   {
     "name": "Taewook Ham",
@@ -43,7 +43,7 @@
     "name": "Dooho Lee",
     "role": "Master's Student",
     "image": "images/dooho.jpg",
-    "research": "Graph neural networks, Graph Foundation Models",
+    "research": "Foundation Models for Structured Data",
     "email": "dooho@kaist.ac.kr",
     "homepage": "https://dooho00.github.io/"
   },
@@ -51,7 +51,7 @@
     "name": "Akotet Tesema",
     "role": "Master's Student",
     "image": "images/akotet.jpg",
-    "research": "GNNs, Recommender Systems",
+    "research": "Graph Neural Networks, Recommender Systems",
     "email": "tesema.akotet@kaist.ac.kr",
     "homepage": "https://akotet08.github.io/"
   },

@@ -1,6 +1,6 @@
 // include-header.js
 document.addEventListener("DOMContentLoaded", () => {
-  fetch("header.html")
+  fetch("header.html", { cache: "no-cache" })
     .then((response) => response.text())
     .then((html) => {
       document.getElementById("site-header").innerHTML = html;
