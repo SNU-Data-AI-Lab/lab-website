@@ -59,7 +59,7 @@
     </style>
   </head>
   <body class="bg-gray-50 text-gray-800">
-    <script src="include-header-footer.js"></script>
+    <script src="include-header-footer.js?v=2"></script>
 
     <!-- Hero Section -->
     <section class="relative flex hero-bg">
@@ -148,18 +148,17 @@
         </div>
       </section>
 
-      <section class="pb-16">
+      <!-- <section class="pb-16">
         <h2 class="text-3xl sm:text-4xl font-light text-gray-400">
           Postdoctoral
         </h2>
         <h2 class="text-3xl sm:text-4xl mb-3 sm:mb-6 font-bold">Researchers</h2>
         <div
           id="postdoctoral_researchers"
-          class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-8"
-        >
+          class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-8"> -->
           <!-- Researcher cards will be injected here -->
-        </div>
-      </section>
+        <!-- </div>
+      </section> -->
 
       <section class="pb-16">
         <h2 class="text-3xl sm:text-4xl font-light text-gray-400">Graduate</h2>
@@ -188,6 +187,32 @@
       <section class="pb-8 sm:pb-16">
         <h2 class="text-3xl sm:text-4xl mb-3 sm:mb-6 font-bold">Alumni</h2>
         <div class="space-y-4">
+          <div class="border border-gray-200 rounded-lg">
+            <button
+              id="toggle-postdoctoral-alumni"
+              class="w-full p-3 sm:p-4 text-left flex items-center justify-between hover:bg-gray-200 transition-colors"
+            >
+              <div class="flex items-center gap-3">
+                <span class="text-lg font-semibold">Postdoctoral Alumni</span>
+                <span id="postdoctoral-alumni-count" class="alumni-count"></span>
+              </div>
+              <svg
+                id="postdoctoral-arrow"
+                class="w-5 h-5 transform transition-transform"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 5l7 7-7 7"
+                ></path>
+              </svg>
+            </button>
+            <div id="postdoctoral-alumni-list" class="hidden px-6 pb-4"></div>
+          </div>
           <div class="border border-gray-200 rounded-lg">
             <button
               id="toggle-graduate-alumni"
@@ -253,7 +278,7 @@
     <div id="site-footer"></div>
 
     <script>
-      fetch("data/postdoctoral_researchers.json")
+      fetch("data/postdoctoral_researchers.json", { cache: "no-cache" })
         .then((response) => response.json())
         .then((postdoctoral_researchers) => {
           const container = document.getElementById("postdoctoral_researchers");
@@ -287,7 +312,7 @@
             }
           );
         });
-      fetch("data/graduate_students.json")
+      fetch("data/graduate_students.json", { cache: "no-cache" })
         .then((response) => response.json())
         .then((graduate_students) => {
           const container = document.getElementById("graduate_students");
@@ -321,7 +346,7 @@
             }
           );
         });
-      fetch("data/undergraduate_interns.json")
+      fetch("data/undergraduate_interns.json", { cache: "no-cache" })
         .then((response) => response.json())
         .then((undergraduate_interns) => {
           const container = document.getElementById("undergraduate_interns");
@@ -336,12 +361,15 @@
             container.appendChild(card);
           });
         });
-      fetch("data/alumni.json")
+      fetch("data/alumni.json", { cache: "no-cache" })
         .then((response) => response.json())
         .then((alumni) => {
           const setupAccordion = (button, list, arrow) => {
+            button.setAttribute("aria-controls", list.id);
+            button.setAttribute("aria-expanded", "false");
             button.addEventListener("click", () => {
               list.classList.toggle("hidden");
+              button.setAttribute("aria-expanded", String(!list.classList.contains("hidden")));
               arrow.classList.toggle("rotate-90");
             });
           };
@@ -360,6 +388,18 @@
               container.appendChild(item);
             });
           };
+
+          // Postdoctoral alumni
+          const postdocBtn = document.getElementById("toggle-postdoctoral-alumni");
+          const postdocList = document.getElementById("postdoctoral-alumni-list");
+          const postdocArrow = document.getElementById("postdoctoral-arrow");
+          const postdocCount = document.getElementById("postdoctoral-alumni-count");
+          const postdocEntries = alumni.postdoctoral_researchers || [];
+          setupAccordion(postdocBtn, postdocList, postdocArrow);
+          renderAlumniDirectory(postdocList, postdocEntries, postdocCount);
+          if (postdocEntries.length === 0) {
+            postdocList.textContent = "No postdoctoral alumni listed yet.";
+          }
 
           // Graduate alumni
           const gradBtn = document.getElementById("toggle-graduate-alumni");
