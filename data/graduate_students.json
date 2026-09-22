@@ -3,8 +3,8 @@
     "name": "Doyun Choi",
     "role": "Ph.D. Student",
     "image": "images/doyun.jpg",
-    "research": "Application of graph neural networks",
-    "email": "doyun.choi@kaist.ac.kr",
+    "research": "Application of AI to Numerical Data",
+    "email": "doyun.choi@snu.ac.kr",
     "homepage": "https://sites.google.com/view/doyunchoi"
   },
   {
@@ -22,14 +22,6 @@
     "research": "Time Series Analysis, Anomaly Detection",
     "email": "jiwon.seo@snu.ac.kr",
     "homepage": "" 
-  },
-  {
-    "name": "Taewook Ham",
-    "role": "Master's Student",
-    "image": "images/taewook.jpg",
-    "research": "Interpretable graph neural networks",
-    "email": "htw0618@kaist.ac.kr",
-    "homepage": ""
   },
   {
     "name": "Myeong Kong",
