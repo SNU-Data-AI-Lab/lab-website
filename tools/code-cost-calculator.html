@@ -15,7 +15,7 @@
   <div class="workbench">
     <section class="editor-panel" aria-label="Java source editor">
       <div class="panel-toolbar"><div class="panel-title"><span class="step">01</span><h2>Source code</h2></div><div class="toolbar-actions"><button class="small-button" id="upload">＋ Open files</button><input id="file-input" type="file" accept=".java" multiple hidden></div></div>
-      <div class="filebar"><div id="files" class="file-tabs" role="tablist" aria-label="Source files"></div><button class="file-add" id="add-file" title="New Java file" aria-label="New Java file">＋</button></div>
+      <div class="filebar"><div id="files" class="file-tabs" role="tablist" aria-label="Source files"></div></div>
       <div class="filename-row"><label for="filename">File name</label><input id="filename" spellcheck="false" value="Main.java" maxlength="100"><button id="remove-file" class="remove-file" aria-label="Remove current file">Remove</button><span id="file-meta"></span></div>
       <div class="code-area" id="drop-area"><pre id="line-numbers" aria-hidden="true"></pre><textarea id="code" aria-label="Java source code" spellcheck="false" autocapitalize="off" autocomplete="off" wrap="off">public class Main {
 
@@ -167,13 +167,19 @@
     }
 }
 }</textarea></div>
-      <div class="editor-bottom"><span>JAVA <span class="dot-separator">·</span> You can also drag and drop .java files here</span><span id="cursor">Ln 1</span></div>
-      <div class="editor-action"><p id="input-status">Edit an example or open files to begin.</p><button id="analyze" class="primary-button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 10 7-10 7Z"/></svg><span>Analyze cost</span><kbd>⌘ ↵</kbd></button></div>
+<div class="editor-bottom" style="min-height: 37px;"></div>
+      <div class="editor-action"><p id="input-status">Edit an example or open files to begin.</p><button id="analyze" class="primary-button"><span>Analyze Cost</span></button></div>
     </section>
     <aside class="results-panel" aria-label="Analysis results">
-      <div class="result-heading"><div class="panel-title"><span class="step">02</span><h2>Analysis results</h2></div><span id="result-status" class="status-label">Not analyzed</span></div>
-      <div class="score-card" id="score-card"><div class="score-top"><span>Total Code Cost</span><span class="metric-version">CLASSROOM v1.0</span></div><div class="score-main"><strong id="score">—</strong><span>cost</span><div id="delta" class="delta" hidden></div></div><div class="budget-line"><span id="budget-message">Cost appears after analysis</span><span>Target <b id="budget-label">20</b> or less</span></div><div class="budget-track"><div id="budget-fill"></div></div></div>
-      <div class="breakdown"><div class="breakdown-row"><span class="metric-icon purple">D</span><div><strong>Duplicate code</strong><small id="dup-detail">Additional copies of the same logic</small></div><b id="dup-cost">—</b></div><div class="breakdown-row"><span class="metric-icon blue">C</span><div><strong>Control-flow complexity</strong><small id="complexity-detail">Amount above the per-method limit × 2</small></div><b id="complexity-cost">—</b></div><div class="breakdown-row"><span class="metric-icon teal">S</span><div><strong>Method size</strong><small id="size-detail">1 for each 5 statements above the limit</small></div><b id="size-cost">—</b></div></div>
+      <div class="result-heading"><div class="panel-title"><span class="step">02</span><h2>Analysis Results</h2></div><span id="result-status" class="status-label">Not analyzed</span></div>
+      <div class="score-card" id="score-card"><div class="score-top"><span>Total Code Cost</span></div><div class="score-main">
+  <strong id="score">—</strong><span>cost</span>
+  <div style="margin-left: auto; margin-right: 20px; align-self: center; display: flex; flex-direction: column; align-items: flex-end; gap: 6px;">
+    <select id="baseline-select" style="font-size: 12px; padding: 4px; border-radius: 5px; border: 1px solid #dfe2ed; background: #fff;" hidden></select>
+    <div id="delta" class="delta" hidden style="margin-left: 0; white-space: nowrap;"></div>
+  </div>
+</div><div class="budget-line"><span id="budget-message">Cost appears after analysis</span><span>Target <b id="budget-label">20</b> or less</span></div><div class="budget-track"><div id="budget-fill"></div></div></div>
+      <div class="breakdown"><div class="breakdown-row"><span class="metric-icon purple">D</span><div><strong>Duplicate Code</strong><small id="dup-detail">Additional copies of the same logic</small></div><b id="dup-cost">—</b></div><div class="breakdown-row"><span class="metric-icon blue">C</span><div><strong>Control-Flow Complexity</strong><small id="complexity-detail">Amount above the per-method limit × 2</small></div><b id="complexity-cost">—</b></div><div class="breakdown-row"><span class="metric-icon teal">S</span><div><strong>Method Size</strong><small id="size-detail">1 for each 5 statements above the limit</small></div><b id="size-cost">—</b></div></div>
       <div class="stats"><div><strong id="stat-files">—</strong><span>Files</span></div><div><strong id="stat-methods">—</strong><span>Methods and constructors</span></div><div><strong id="stat-duplicates">—</strong><span>Duplicate groups</span></div></div>
       <button id="save-baseline" class="baseline-button" disabled>Save current result as baseline</button>
       <div id="baseline-list" class="baseline-list"></div>
@@ -199,9 +205,9 @@
       </div>
     </details>
   </section>
-  <details class="rules" id="rules"><summary><span><span class="rules-icon" aria-hidden="true">≡</span>Scoring rules and targets</span><span class="rules-version">Classroom Java 1.0</span></summary><div class="rules-content"><p class="rules-intro">Lower is better. You do not need to reduce cost further once it is at or below the target.</p><div class="settings"><label>Target cost<input type="number" id="budget" value="20" min="0" max="1000"></label><label>Method complexity limit<input type="number" id="complexityLimit" value="10" min="1" max="50"></label><label>Method statement limit<input type="number" id="sizeLimit" value="30" min="5" max="200"></label><label>Minimum duplicate tokens<input type="number" id="duplicateTokens" value="50" min="20" max="200"></label></div><div class="formula"><strong>Total cost = duplicate cost + complexity cost + size cost</strong><p>Complexity: sum max(0, complexity − limit) × 2 for each method<br>Size: sum the ceiling of statements above the limit divided by 5<br>Duplicates: sum ceiling(tokens per group ÷ 10) × (copies − 1)</p></div><div class="rule-columns"><div><h3>What is counted?</h3><p><code>if</code>, loops, <code>switch</code>, <code>catch</code>, ternary expressions cost 1 + nesting depth. <code>else if</code>is counted at the same depth, and <code>&amp;&amp;</code>·<code>||</code>each adds 1. Recursion has no separate cost.</p><p>Statement count includes variable declarations, executable statements, and control statements. Block braces, comments, blank lines, method declarations, and <code>for</code>headers are not counted separately. Constructors and initializer blocks are also analyzed.</p></div></div></div></details>
+  <details class="rules" id="rules"><summary><span><span class="rules-icon" aria-hidden="true">≡</span>Scoring rules and targets</span></summary><div class="rules-content"><p class="rules-intro">Lower is better. You do not need to reduce cost further once it is at or below the target.</p><div class="settings"><label>Target cost<input type="number" id="budget" value="20" min="0" max="1000"></label><label>Method complexity limit<input type="number" id="complexityLimit" value="10" min="1" max="50"></label><label>Method statement limit<input type="number" id="sizeLimit" value="30" min="5" max="200"></label><label>Minimum duplicate tokens<input type="number" id="duplicateTokens" value="50" min="20" max="200"></label></div><div class="formula"><strong>Total cost = duplicate cost + complexity cost + size cost</strong><p>Complexity: sum max(0, complexity − limit) × 2 for each method<br>Size: sum the ceiling of statements above the limit divided by 5<br>Duplicates: sum ceiling(tokens per group ÷ 10) × (copies − 1)</p></div><div class="rule-columns"><div><h3>What is counted?</h3><p><code>if</code>, loops, <code>switch</code>, <code>catch</code>, ternary expressions cost 1 + nesting depth. <code>else if</code>is counted at the same depth, and <code>&amp;&amp;</code>·<code>||</code>each adds 1. Recursion has no separate cost.</p><p>Statement count includes variable declarations, executable statements, and control statements. Block braces, comments, blank lines, method declarations, and <code>for</code>headers are not counted separately. Constructors and initializer blocks are also analyzed.</p></div></div></div></details>
 </main>
-<footer><span>QUALITY LAB <span class="footer-slash">/</span> JAVA</span></footer>
+
 <dialog id="replace-dialog"><h2>Replace the current code?</h2><p>Loading an example replaces the files currently being edited. Your saved baseline remains.</p><div class="dialog-actions"><button id="cancel-replace" class="small-button">Cancel</button><button id="confirm-replace" class="primary-button">Load example</button></div></dialog>
 <script>
 self.addEventListener('DOMContentLoaded', () => {
@@ -226,15 +232,37 @@ self.addEventListener('DOMContentLoaded', () => {
   let filesState = { 'Main.java': codeEl.value };
   let activeFile = 'Main.java';
 
-  // Save Baseline Event Listener & UI Updater
+const baselineSelect = document.getElementById('baseline-select');
+
+// Save Baseline Event Listener & UI Updater
   saveBaselineBtn.addEventListener('click', () => {
-    baselineCost = lastTotalCost;
-    
     // Save to list
     const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-    savedBaselines.push({ cost: lastTotalCost, time: timestamp });
+    const baselineId = savedBaselines.length + 1;
+    savedBaselines.push({ cost: lastTotalCost, time: timestamp, id: baselineId });
+    
+    baselineCost = lastTotalCost;
+    
+    // Update dropdown options (time removed)
+    baselineSelect.innerHTML = savedBaselines.map(b => 
+      `<option value="${b.id}">Baseline ${b.id}</option>`
+    ).join('');
+    
+    baselineSelect.value = baselineId;
+    baselineSelect.hidden = false;
     
     updateBaselineUI();
+  });
+
+  // Handle user changing the baseline comparison
+  baselineSelect.addEventListener('change', (e) => {
+    const selectedId = parseInt(e.target.value, 10);
+    const selectedBaseline = savedBaselines.find(b => b.id === selectedId);
+    
+    if (selectedBaseline) {
+      baselineCost = selectedBaseline.cost;
+      updateBaselineUI();
+    }
   });
 
   function updateBaselineUI() {
@@ -257,12 +285,12 @@ self.addEventListener('DOMContentLoaded', () => {
       deltaEl.className = 'delta higher';
     }
 
-    // Render baseline list
+    // Render baseline list (time removed)
     const listContainer = document.getElementById('baseline-list');
     if(listContainer) {
       listContainer.innerHTML = savedBaselines.map((b, i) =>
         `<div class="baseline-item">
-          <span>Baseline ${i + 1} (${b.time})</span>
+          <span>Baseline ${i + 1}</span>
           <b>Score: ${b.cost}</b>
         </div>`
       ).join('');
