@@ -24,6 +24,14 @@
     "homepage": "" 
   },
   {
+    "name": "Sagad Hamid",
+    "role": "Ph.D. Student",
+    "image": "images/preview.png",
+    "research": "Probabilistic Modeling & Inference",
+    "email": "sagad.hamid@uni-muenster.de",
+    "homepage": ""
+  },
+  {
     "name": "Myeong Kong",
     "role": "Master's Student",
     "image": "images/myeong.jpg",
@@ -72,7 +80,7 @@
     "name": "Jongbok Lee",
     "role": "Master's Student",
     "image": "images/jongbok.png",
-    "research": "Fairness in graph recommendation system",
+    "research": "Graph Diffusion, Graph Foundation Models",
     "email": "ljbassa@kaist.ac.kr"
   },
   {
