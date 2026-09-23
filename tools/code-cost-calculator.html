@@ -629,6 +629,7 @@ const baselineSelect = document.getElementById('baseline-select');
 
     const structuralCost = totalMethodCountCost + totalAttributeCountCost;
     const totalCost = totalComplexityCost + totalSizeCost + totalDuplicateCost + structuralCost;
+    lastTotalCost = totalCost;
 
     // Enable Save Baseline button and refresh delta text if baseline was set
     saveBaselineBtn.disabled = false;
