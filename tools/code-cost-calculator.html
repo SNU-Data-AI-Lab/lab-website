@@ -190,22 +190,30 @@
   <section class="findings-section">
     <details class="rules" id="method-measurements">
       <summary>
-        <span><span class="rules-icon" aria-hidden="true">≡</span>All method measurements</span>
+        <span><span class="rules-icon" aria-hidden="true">≡</span>Costs per Input File</span>
         <span class="rules-version" id="method-count"></span>
       </summary>
       <div class="rules-content">
         <div class="table-scroll">
           <table>
             <thead>
-              <tr><th>File / method</th><th>Line</th><th>Complexity</th><th>Statements</th><th>Maximum nesting</th><th>Complexity and size cost</th></tr>
-            </thead>
+  <tr>
+    <th>File</th>
+    <th>Method count</th>
+    <th>Attribute count</th>
+    <th>Duplicate cost</th>
+    <th>Complexity cost</th>
+    <th>Size cost</th>
+    <th>Total cost</th>
+  </tr>
+</thead>
             <tbody id="method-table"></tbody>
           </table>
         </div>
       </div>
     </details>
   </section>
-  <details class="rules" id="rules"><summary><span><span class="rules-icon" aria-hidden="true">≡</span>Scoring rules and targets</span></summary><div class="rules-content"><p class="rules-intro">Lower is better. You do not need to reduce cost further once it is at or below the target.</p><div class="settings"><label>Target cost<input type="number" id="budget" value="20" min="0" max="1000"></label><label>Method complexity limit<input type="number" id="complexityLimit" value="10" min="1" max="50"></label><label>Method statement limit<input type="number" id="sizeLimit" value="30" min="5" max="200"></label><label>Minimum duplicate tokens<input type="number" id="duplicateTokens" value="50" min="20" max="200"></label><label>Free methods per class<input type="number" id="methodFreeLimit" value="5" min="0" max="50"></label><label>Linear methods per class<input type="number" id="methodLinearLimit" value="10" min="1" max="100"></label><label>Free attributes per class<input type="number" id="attributeFreeLimit" value="5" min="0" max="50"></label><label>Linear attributes per class<input type="number" id="attributeLinearLimit" value="10" min="1" max="100"></label></div><div class="formula"><strong>Total cost = duplicate + complexity + size + method-count + attribute-count costs</strong><p>Complexity: sum max(0, complexity − limit) × 2 for each method<br>Size: sum the ceiling of statements above the limit divided by 5<br>Duplicates: sum ceiling(tokens per group ÷ 10) × (copies − 1)<br>Class structure: each class has a free range, then a linear range, then an exponential penalty for methods and attributes. For either metric, cost is 0 through the free limit; after that it increases linearly up to the linear limit; beyond the linear limit, the additional penalty grows exponentially.</p></div><div class="rule-columns"><div><h3>What is counted?</h3><p><code>if</code>, loops, <code>switch</code>, <code>catch</code>, ternary expressions cost 1 + nesting depth. <code>else if</code>is counted at the same depth, and <code>&amp;&amp;</code>·<code>||</code>each adds 1. Recursion has no separate cost.</p><p>Statement count includes variable declarations, executable statements, and control statements. Block braces, comments, blank lines, method declarations, and <code>for</code>headers are not counted separately. Constructors and initializer blocks are also analyzed.</p></div></div></div></details>
+  <details class="rules" id="rules"><summary><span><span class="rules-icon" aria-hidden="true">≡</span>Scoring Rules and Targets</span></summary><div class="rules-content"><p class="rules-intro">Lower is better. You do not need to reduce cost further once it is at or below the target.</p><div class="settings"><label>Target cost<input type="number" id="budget" value="20" min="0" max="1000"></label><label>Method complexity limit<input type="number" id="complexityLimit" value="10" min="1" max="50"></label><label>Method statement limit<input type="number" id="sizeLimit" value="30" min="5" max="200"></label><label>Minimum duplicate tokens<input type="number" id="duplicateTokens" value="50" min="20" max="200"></label><label>Free methods per class<input type="number" id="methodFreeLimit" value="5" min="0" max="50"></label><label>Linear methods per class<input type="number" id="methodLinearLimit" value="10" min="1" max="100"></label><label>Free attributes per class<input type="number" id="attributeFreeLimit" value="5" min="0" max="50"></label><label>Linear attributes per class<input type="number" id="attributeLinearLimit" value="10" min="1" max="100"></label></div><div class="formula"><strong>Total cost = duplicate + complexity + size + method-count + attribute-count costs</strong><p>Complexity: sum max(0, complexity − limit) × 2 for each method<br>Size: sum the ceiling of statements above the limit divided by 5<br>Duplicates: sum ceiling(tokens per group ÷ 10) × (copies − 1)<br>Class structure: each class has a free range, then a linear range, then an exponential penalty for methods and attributes. For either metric, cost is 0 through the free limit; after that it increases linearly up to the linear limit; beyond the linear limit, the additional penalty grows exponentially.</p></div><div class="rule-columns"><div><h3>What is counted?</h3><p><code>if</code>, loops, <code>switch</code>, <code>catch</code>, ternary expressions cost 1 + nesting depth. <code>else if</code>is counted at the same depth, and <code>&amp;&amp;</code>·<code>||</code>each adds 1. Recursion has no separate cost.</p><p>Statement count includes variable declarations, executable statements, and control statements. Block braces, comments, blank lines, method declarations, and <code>for</code>headers are not counted separately. Constructors and initializer blocks are also analyzed.</p></div></div></div></details>
 </main>
 
 <dialog id="replace-dialog"><h2>Replace the current code?</h2><p>Loading an example replaces the files currently being edited. Your saved baseline remains.</p><div class="dialog-actions"><button id="cancel-replace" class="small-button">Cancel</button><button id="confirm-replace" class="primary-button">Load example</button></div></dialog>
@@ -497,7 +505,7 @@ const baselineSelect = document.getElementById('baseline-select');
       const clean = stripJavaCommentsAndStrings(src);
       const classes = classMetrics(src);
 
-      // Preserve the existing file-level complexity/size scoring.
+      // Preserve existing file-level complexity/size scoring
       let complexity = 1;
       let statements = 0;
       const branchMatches = clean.match(/\b(if|else if|for|while|switch|catch|case)\b|&&|\|\|/g);
@@ -507,6 +515,7 @@ const baselineSelect = document.getElementById('baseline-select');
 
       const compCost = Math.max(0, complexity - limitC) * 2;
       const sizeCost = Math.max(0, Math.ceil((statements - limitS) / 5));
+      const dupCost = 0; // Duplicate code cost placeholder
 
       totalComplexityCost += compCost;
       totalSizeCost += sizeCost;
@@ -514,29 +523,36 @@ const baselineSelect = document.getElementById('baseline-select');
       for (const cls of classes) {
         const methodCost = structuralCountCost(cls.methods, safeMethodFree, safeMethodLinear);
         const attributeCost = structuralCountCost(cls.attributes, safeAttributeFree, safeAttributeLinear);
+        
+        // FIX: Using the correct accumulator variable names from original script
         totalMethodCountCost += methodCost;
-        totalAttributeCountCost += attributeCost;
+        totalAttributeCountCost += attributeCost; 
         totalMethods += cls.methods;
 
+        const totalItemCost = compCost + sizeCost + dupCost + methodCost + attributeCost;
+
         methodTableHtml += `<tr>
-          <td>${fileName} / ${cls.name}</td>
-          <td>—</td>
-          <td>—</td>
-          <td>—</td>
-          <td>—</td>
-          <td>${methodCost + attributeCost} <small>(M ${methodCost}, A ${attributeCost})</small></td>
+          <td>${fileName}</td>
+          <td>${cls.methods}</td>
+          <td>${cls.attributes}</td>
+          <td>${dupCost}</td>
+          <td>${compCost}</td>
+          <td>${sizeCost}</td>
+          <td><strong>${totalItemCost}</strong></td>
         </tr>`;
       }
 
-      // If a file has no recognizable class, retain a useful row.
+      // Fallback for files with no recognizable class
       if (!classes.length) {
+        const totalItemCost = compCost + sizeCost + dupCost;
         methodTableHtml += `<tr>
           <td>${fileName}</td>
-          <td>—</td>
-          <td>${complexity}</td>
-          <td>${statements}</td>
-          <td>—</td>
-          <td>${compCost + sizeCost}</td>
+          <td>0</td>
+          <td>0</td>
+          <td>${dupCost}</td>
+          <td>${compCost}</td>
+          <td>${sizeCost}</td>
+          <td><strong>${totalItemCost}</strong></td>
         </tr>`;
       }
     }
