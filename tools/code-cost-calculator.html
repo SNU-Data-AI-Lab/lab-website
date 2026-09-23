@@ -475,6 +475,74 @@ const baselineSelect = document.getElementById('baseline-select');
     const linearCost = linear - free;
     return linearCost + Math.pow(2, count - linear) - 1;
   }
+  
+  // Helper to convert Java source code into clean tokens
+  function tokenizeJava(src) {
+    const clean = stripJavaCommentsAndStrings(src);
+    const matches = clean.match(/[A-Za-z_$][\w$]*|[0-9]+|==|!=|<=|>=|&&|\|\||\+\+|--|[+\-*\/%&|^!=<>{}()\[\];,]/g);
+    return matches || [];
+  }
+
+  // Token sliding window detector for multi-file duplicate code scanning
+  // Fixed token sliding window detector
+  function findDuplicates(files, minTokens) {
+    const tokenizedFiles = {};
+    for (const [name, src] of Object.entries(files)) {
+      tokenizedFiles[name] = tokenizeJava(src);
+    }
+
+    const windowSize = Math.max(10, minTokens);
+    const fileEntries = Object.entries(tokenizedFiles);
+    
+    // Track indices that have already been marked as part of a duplicate sequence
+    const coveredIndices = {};
+    for (const [name] of fileEntries) coveredIndices[name] = new Set();
+
+    let totalDuplicateCost = 0;
+    let duplicateGroups = 0;
+
+    for (let f1 = 0; f1 < fileEntries.length; f1++) {
+      const [fileName1, tokens1] = fileEntries[f1];
+
+      for (let i = 0; i <= tokens1.length - windowSize; i++) {
+        if (coveredIndices[fileName1].has(i)) continue;
+
+        const seq1 = tokens1.slice(i, i + windowSize).join(' ');
+        let copies = 1;
+        let matchedPositions = [];
+
+        for (let f2 = f1; f2 < fileEntries.length; f2++) {
+          const [fileName2, tokens2] = fileEntries[f2];
+          const startJ = (f1 === f2) ? i + windowSize : 0;
+
+          for (let j = startJ; j <= tokens2.length - windowSize; j++) {
+            if (coveredIndices[fileName2].has(j)) continue;
+
+            const seq2 = tokens2.slice(j, j + windowSize).join(' ');
+            if (seq1 === seq2) {
+              copies++;
+              matchedPositions.push({ file: fileName2, index: j });
+            }
+          }
+        }
+
+        if (copies > 1) {
+          duplicateGroups++;
+          const groupCost = Math.ceil(windowSize / 10) * (copies - 1);
+          totalDuplicateCost += groupCost;
+
+          // Mark all matched windows as covered to prevent redundant overlapping scoring
+          for (let k = 0; k < windowSize; k++) {
+            coveredIndices[fileName1].add(i + k);
+            matchedPositions.forEach(p => coveredIndices[p.file].add(p.index + k));
+          }
+          i += windowSize - 1; // Jump past processed block
+        }
+      }
+    }
+
+    return { totalDuplicateCost, duplicateGroups };
+  }
 
   function runAnalysis() {
     filesState[activeFile] = codeEl.value; // Ensure current typing is saved
@@ -489,6 +557,8 @@ const baselineSelect = document.getElementById('baseline-select');
 
     const limitC = parseInt(document.getElementById('complexityLimit').value, 10) || 10;
     const limitS = parseInt(document.getElementById('sizeLimit').value, 10) || 30;
+    const minTokens = parseInt(document.getElementById('duplicateTokens').value, 10) || 50;
+    const { totalDuplicateCost, duplicateGroups } = findDuplicates(filesState, minTokens);
     const methodFree = parseInt(document.getElementById('methodFreeLimit').value, 10);
     const methodLinear = parseInt(document.getElementById('methodLinearLimit').value, 10);
     const attributeFree = parseInt(document.getElementById('attributeFreeLimit').value, 10);
@@ -515,7 +585,7 @@ const baselineSelect = document.getElementById('baseline-select');
 
       const compCost = Math.max(0, complexity - limitC) * 2;
       const sizeCost = Math.max(0, Math.ceil((statements - limitS) / 5));
-      const dupCost = 0; // Duplicate code cost placeholder
+      const dupCost = totalDuplicateCost;
 
       totalComplexityCost += compCost;
       totalSizeCost += sizeCost;
@@ -558,8 +628,7 @@ const baselineSelect = document.getElementById('baseline-select');
     }
 
     const structuralCost = totalMethodCountCost + totalAttributeCountCost;
-    const totalCost = totalComplexityCost + totalSizeCost + structuralCost;
-    lastTotalCost = totalCost;
+    const totalCost = totalComplexityCost + totalSizeCost + totalDuplicateCost + structuralCost;
 
     // Enable Save Baseline button and refresh delta text if baseline was set
     saveBaselineBtn.disabled = false;
@@ -573,9 +642,13 @@ const baselineSelect = document.getElementById('baseline-select');
     document.getElementById('method-count-cost').textContent = totalMethodCountCost;
     document.getElementById('attribute-count-cost').textContent = totalAttributeCountCost;
 
+    document.getElementById('dup-cost').textContent = totalDuplicateCost;
+    document.getElementById('method-count-cost').textContent = totalMethodCountCost;
+    document.getElementById('attribute-count-cost').textContent = totalAttributeCountCost;
+
     document.getElementById('stat-files').textContent = fileCount;
     document.getElementById('stat-methods').textContent = totalMethods;
-    document.getElementById('stat-duplicates').textContent = "0";
+    document.getElementById('stat-duplicates').textContent = duplicateGroups;
 
     document.getElementById('method-count-detail').textContent =
       `${safeMethodFree} free/class → linear through ${safeMethodLinear}, then exponential`;
