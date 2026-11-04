@@ -14,6 +14,12 @@
 <body>
 <main>
   <div class="page-heading"><div><div class="eyebrow"><a href="../tools.html">&larr; DAI Lab / Tools</a></div><h1>Java Design Analysis</h1></div></div>
+  <section class="feedback-card" style="margin-bottom:20px">
+    <label for="analysis-mode"><strong>Analysis mode</strong></label>
+    <select id="analysis-mode"><option value="legacy">HW1 / HW2 — original 8 rules</option><option value="hw3">HW3 — original 8 + Collections / Exceptions / I/O</option></select>
+    <p id="scope-note">Original analysis rules and upload behavior.</p>
+    <p>HW3: open all nine supplied workshop files plus every helper .java file together. Upload replaces the current set. Exclude Main.java and TestSupport.java. Cost is not a functional score.</p>
+  </section>
   <div class="workbench">
     <section class="editor-panel" aria-label="Java source editor">
       <div class="panel-toolbar"><div class="panel-title"><span class="step">01</span><h2>Source code</h2></div><div class="toolbar-actions"><button class="small-button" id="upload">＋ Open files</button><input id="file-input" type="file" accept=".java" multiple hidden></div></div>
@@ -191,12 +197,25 @@
         <div class="breakdown-row"><span class="metric-icon purple">O</span><div><strong>Override Practice</strong></div><b id="override-cost">—</b></div>
         <div class="breakdown-row"><span class="metric-icon blue">P</span><div><strong>Polymorphism</strong></div><b id="polymorphism-cost">—</b></div>
       </div>
+      <div id="hw3-results" hidden>
+        <div class="breakdown-row"><strong>Original 8 subtotal</strong><b id="legacy-subtotal">—</b></div>
+        <div class="breakdown-row"><strong>Collections</strong><b id="collections-cost">—</b></div>
+        <div class="breakdown-row"><strong>Exception Handling</strong><b id="exceptions-cost">—</b></div>
+        <div class="breakdown-row"><strong>I/O Practices</strong><b id="io-cost">—</b></div>
+        <p id="hw3-scope" class="score-caption"></p>
+      </div>
       <div class="stats"><div><strong id="stat-files">—</strong><span>Files</span></div><div><strong id="stat-methods">—</strong><span>Methods and constructors</span></div><div><strong id="stat-duplicates">—</strong><span>Duplicate groups</span></div></div>
       <button id="save-baseline" class="baseline-button" disabled>Save current result as baseline</button>
       <div id="baseline-list" class="baseline-list"></div>
       
     </aside>
   </div>
+  <section id="hw3-details" class="feedback-card" style="margin-top:24px" hidden>
+    <h2>HW3 findings</h2><p>Only listed patterns contribute to cost. Review notes carry zero cost. No grade conversion has been finalized.</p>
+    <div id="hw3-findings"></div><div id="hw3-reviews"></div>
+    <div class="table-scroll"><table><thead><tr><th>File</th><th>Collections</th><th>Exceptions</th><th>I/O</th><th>HW3 added</th><th>Combined</th></tr></thead><tbody id="hw3-table"></tbody></table></div>
+    <details><summary>HW3 rules v1.0.0 and limits</summary><p>C1 raw collection declarations +1; C2 query snapshot violations +2/method; C3 shared static mutable collection +2/field; E1 broad catch +2; E2 suppressed/misclassified failure +3 (E1/E2 use the larger cost per catch); I1 locally unclosed file resource +2; I2 platform-default charset +1. Lexical analysis cannot prove arbitrary aliasing, custom types, helper behavior or all resource paths. Review notes and runtime tests are required for those cases. Collection role detection is informational, not proof of use.</p></details>
+  </section>
   <div id="notice" role="status" aria-live="polite" hidden></div>
   <section class="findings-section">
     <details class="rules" id="method-measurements">
@@ -226,6 +245,7 @@
 </main>
 
 <dialog id="replace-dialog"><h2>Replace the current code?</h2><p>Loading an example replaces the files currently being edited. Your saved baseline remains.</p><div class="dialog-actions"><button id="cancel-replace" class="small-button">Cancel</button><button id="confirm-replace" class="primary-button">Load example</button></div></dialog>
+<script src="code-cost-hw3.js"></script>
 <script>
 self.addEventListener('DOMContentLoaded', () => {
   const codeEl = document.getElementById('code');
@@ -248,6 +268,34 @@ self.addEventListener('DOMContentLoaded', () => {
   // 1. State Management
   let filesState = { 'Main.java': codeEl.value };
   let activeFile = 'Main.java';
+  const modeEl = document.getElementById('analysis-mode');
+  const isHW3 = () => modeEl.value === 'hw3';
+  function resetBaselines() {
+    baselineCost = null; savedBaselines = []; saveBaselineBtn.disabled = true;
+    document.getElementById('baseline-select').hidden = true;
+    document.getElementById('baseline-select').innerHTML = '';
+    document.getElementById('baseline-list').innerHTML = ''; deltaEl.hidden = true;
+  }
+  function markStale() {
+    saveBaselineBtn.disabled = true;
+    document.getElementById('result-status').textContent = 'Reanalyze';
+    document.getElementById('result-status').className = 'status-label stale';
+  }
+  modeEl.addEventListener('change', () => {
+    filesState[activeFile] = codeEl.value;
+    if (isHW3()) {
+      delete filesState['Main.java']; delete filesState['TestSupport.java'];
+      if (!Object.keys(filesState).length) filesState = { 'Student.java': '' };
+      activeFile = Object.keys(filesState)[0]; codeEl.value = filesState[activeFile];
+      filenameInput.value = activeFile; renderTabs(); updateLines();
+    }
+    resetBaselines(); markStale();
+    document.getElementById('hw3-results').hidden = !isHW3();
+    document.getElementById('hw3-details').hidden = !isHW3();
+    document.getElementById('scope-note').textContent = isHW3() ? 'HW3: each upload replaces the entire source set; grading thresholds are pending.' : 'Original analysis rules and upload behavior.';
+  });
+  ['complexityLimit','sizeLimit','duplicateTokens'].forEach(id => document.getElementById(id).addEventListener('input', () => { resetBaselines(); markStale(); }));
+
 
 const baselineSelect = document.getElementById('baseline-select');
 
@@ -355,9 +403,22 @@ const baselineSelect = document.getElementById('baseline-select');
     const files = event.target.files;
     if (!files.length) return;
 
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
-      const text = await file.text();
+    const selected = Array.from(files);
+    if (isHW3()) {
+      const invalid = selected.filter(f => !f.name.endsWith('.java') || ['Main.java','TestSupport.java'].includes(f.name));
+      const duplicate = new Set(selected.map(f => f.name)).size !== selected.length;
+      if (invalid.length || duplicate) {
+        const n=document.getElementById('notice'); n.hidden=false;
+        n.textContent='Select only workshop .java files (including helpers), with unique filenames. Main.java/TestSupport.java are excluded.';
+        fileInput.value=''; return;
+      }
+    }
+    if (isHW3()) selected.sort((a,b) => a.name < b.name ? -1 : a.name > b.name ? 1 : 0);
+    const incoming = await Promise.all(selected.map(async file => [file.name, await file.text()]));
+    if (isHW3()) filesState = {};
+    for (let i = 0; i < incoming.length; i++) {
+      const file = { name: incoming[i][0] };
+      const text = incoming[i][1];
       filesState[file.name] = text;
       activeFile = file.name; // Focus the last uploaded file
     }
@@ -368,17 +429,20 @@ const baselineSelect = document.getElementById('baseline-select');
     renderTabs();
     updateLines();
 //    runAnalysis();
+    markStale();
+    document.getElementById('notice').hidden=true;
     fileInput.value = ''; // Reset input
   });
 
   // 4. Remove File Logic
   removeBtn.addEventListener('click', () => {
+    markStale();
     delete filesState[activeFile];
 
     const remainingFiles = Object.keys(filesState);
 
     if (remainingFiles.length === 0) {
-      activeFile = 'Main.java';
+      activeFile = isHW3() ? 'Student.java' : 'Main.java';
       filesState[activeFile] = '';
     } else {
       activeFile = remainingFiles[0];
@@ -394,6 +458,7 @@ const baselineSelect = document.getElementById('baseline-select');
 
   // Keep state synced when typing
   codeEl.addEventListener('input', () => {
+    markStale();
     updateLines();
     filesState[activeFile] = codeEl.value;
   });
@@ -702,11 +767,24 @@ const baselineSelect = document.getElementById('baseline-select');
     const limitC = parseInt(document.getElementById('complexityLimit').value, 10) || 10, limitS = parseInt(document.getElementById('sizeLimit').value, 10) || 30, minTokens = parseInt(document.getElementById('duplicateTokens').value, 10) || 50;
     const r = analyzeFiles(filesState, limitC, limitS, minTokens);
     const feedback = teachingFeedback(r.parsed, r.warnings);
+    const hw = isHW3() ? HW3Cost.analyze(filesState) : null;
+    document.getElementById('hw3-results').hidden = !hw;
+    document.getElementById('hw3-details').hidden = !hw;
+    if (hw) {
+      document.getElementById('legacy-subtotal').textContent = r.totalCost;
+      for(const key of ['collections','exceptions','io']) document.getElementById(key+'-cost').textContent=hw.totals[key];
+      document.getElementById('hw3-scope').textContent = hw.missing.length ? 'Incomplete source set: missing '+hw.missing.join(', ')+'. Cost is diagnostic only.' : 'Required type names detected. Run functional tests separately. Added cost: '+hw.totalCost+'.';
+      document.getElementById('hw3-findings').innerHTML=hw.findings.length ? hw.findings.map(x=>`<div class="feedback-item warning">${escapeHtml(x.file)}:${x.line} · ${x.rule} +${x.cost} · ${escapeHtml(x.message)}</div>`).join('') : '<div class="feedback-item ok">No additional cost patterns detected.</div>';
+      const notes=hw.reviews.map(x=>`${x.file}:${x.line} · ${x.message}`);
+      if(hw.roleReview.length) notes.push('Collection roles not detected: '+hw.roleReview.join(', ')+'. Inspect manually; no automatic cost.');
+      document.getElementById('hw3-reviews').innerHTML=notes.map(x=>`<div class="feedback-item info">Review (0 cost): ${escapeHtml(x)}</div>`).join('');
+      document.getElementById('hw3-table').innerHTML=Object.entries(hw.perFile).map(([f,x])=>`<tr><td>${escapeHtml(f)}</td><td>${x.collections}</td><td>${x.exceptions}</td><td>${x.io}</td><td>${x.total}</td><td>${r.perFile[f].total+x.total}</td></tr>`).join('');
+    }
     let rows = '';
     for (const [fileName, x] of Object.entries(r.perFile)) {
       rows += `<tr><td>${escapeHtml(fileName)}</td><td>${x.classes}</td><td>${x.methods}</td><td>${x.dup}</td><td>${x.complexity}</td><td>${x.size}</td><td>${x.encapsulation}</td><td>${x.reuse}</td><td>${x.hiding}</td><td>${x.override}</td><td>${x.polymorphism}</td><td><strong>${x.total}</strong></td></tr>`;
     }
-    const totalCost = r.totalCost; lastTotalCost = totalCost; saveBaselineBtn.disabled = false; updateBaselineUI();
+    const totalCost = r.totalCost + (hw ? hw.totalCost : 0); lastTotalCost = totalCost; saveBaselineBtn.disabled = false; updateBaselineUI();
     document.getElementById('score').textContent = totalCost; document.getElementById('dup-cost').textContent = r.duplicates.totalDuplicateCost; document.getElementById('complexity-cost').textContent = r.totals.complexity; document.getElementById('size-cost').textContent = r.totals.size; document.getElementById('encapsulation-cost').textContent = r.totals.encapsulation; document.getElementById('inheritance-reuse-cost').textContent = r.totals.reuse; document.getElementById('field-hiding-cost').textContent = r.totals.hiding; document.getElementById('override-cost').textContent = r.totals.override; document.getElementById('polymorphism-cost').textContent = r.totals.polymorphism;
     document.getElementById('stat-files').textContent = Object.keys(filesState).length; document.getElementById('stat-methods').textContent = r.totalMethods; document.getElementById('stat-duplicates').textContent = r.duplicates.duplicateGroups; document.getElementById('result-status').textContent = 'Analyzed'; document.getElementById('result-status').className = 'status-label current';
     document.getElementById('method-table').innerHTML = rows; document.getElementById('method-count').textContent = `${Object.keys(filesState).length} files · ${r.classCount} classes · ${r.totalMethods} methods`; renderFeedback(feedback);
