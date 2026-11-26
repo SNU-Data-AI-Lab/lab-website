@@ -56,7 +56,9 @@
 
     <div id="site-footer"></div>
 
+    <script src="js/site-security.js"></script>
     <script>
+      const { escapeHtml, safeWebUrl } = SiteSecurity;
       let currentView = "papers";
       let papersData = null;
       let tutorialsData = null;
@@ -140,9 +142,9 @@
           const authorElements = item.authors.map((author, index) => {
             const isLabMember = item.is_lab_member && item.is_lab_member[index];
             if (isLabMember) {
-              return `<span class="underline font-semibold">${author}</span>`;
+              return `<span class="underline font-semibold">${escapeHtml(author)}</span>`;
             } else {
-              return author;
+              return escapeHtml(author);
             }
           });
 
@@ -164,11 +166,13 @@
               : ["paper", "code", "web", "video", "slides"];
 
           for (const [label, href] of Object.entries(item.links)) {
-            if (href && allowedLinks.includes(label)) {
+            const safeHref = safeWebUrl(href);
+            if (safeHref && allowedLinks.includes(label)) {
               const a = document.createElement("a");
-              a.href = href;
+              a.href = safeHref;
               a.className = "text-blue-600 hover:underline";
               a.target = "_blank";
+              a.rel = "noopener noreferrer";
               a.textContent = label;
               linkElements.push(a);
             }

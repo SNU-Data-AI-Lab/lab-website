@@ -1,0 +1,7 @@
+# Keep development files out of the existing GitHub Pages/Jekyll publication.
+exclude:
+  - CNAME
+  - package.json
+  - package-lock.json
+  - extract.py
+  - node_modules
