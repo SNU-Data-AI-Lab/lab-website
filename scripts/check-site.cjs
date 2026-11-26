@@ -14,6 +14,7 @@ for (const filename of [
   ...pages,
   "header.html",
   "footer.html",
+  "include-header-footer.js",
   "css/output.css",
   "js/site-security.js",
   "js/research.js",
@@ -42,9 +43,10 @@ function walk(directory) {
       walk(absolute);
     } else {
       assert(
-        /^(?:index|members|publications|tools|header|footer)\.html$/.test(
-          relative,
-        ) ||
+        relative === "include-header-footer.js" ||
+          /^(?:index|members|publications|tools|header|footer)\.html$/.test(
+            relative,
+          ) ||
           /^(?:images\/.+\.(?:png|jpe?g|ico|svg)|data\/[\w-]+\.json|(?:css|assets\/css)\/[\w.-]+\.css|(?:js|tools)\/[\w.-]+\.js|tools\/code-cost-calculator\.html)$/.test(
             relative,
           ),
