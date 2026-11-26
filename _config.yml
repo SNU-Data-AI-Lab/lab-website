@@ -1,6 +1,8 @@
 # GitHub's existing branch-based Pages build uses Jekyll from the repository root.
 # Only public site content belongs in its output; .gitignore is not a Pages policy.
 exclude:
+  # Keep the existing Pages default: the domain-control file is not site content.
+  - CNAME
   - package.json
   - package-lock.json
   - extract.py
