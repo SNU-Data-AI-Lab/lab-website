@@ -1,4 +1,4 @@
-(function (root) {
+(() => {
   "use strict";
 
   function escapeHtml(value) {
@@ -15,7 +15,7 @@
     );
   }
 
-  function safeWebUrl(value, base = root.document?.baseURI) {
+  function safeWebUrl(value, base = document.baseURI) {
     if (typeof value !== "string" || !value.trim()) return "";
     try {
       const url = new URL(value, base);
@@ -29,7 +29,7 @@
     }
   }
 
-  function safeImageUrl(value, base = root.document?.baseURI) {
+  function safeImageUrl(value, base = document.baseURI) {
     const href = safeWebUrl(value, base);
     // Repository images must remain on the site; JSON cannot introduce tracking images.
     try {
@@ -49,6 +49,5 @@
   }
 
   const api = { escapeHtml, safeWebUrl, safeImageUrl, safeEmailUrl };
-  if (typeof module === "object" && module.exports) module.exports = api;
-  else root.SiteSecurity = Object.freeze(api);
-})(typeof globalThis !== "undefined" ? globalThis : this);
+  window.SiteSecurity = Object.freeze(api);
+})();
