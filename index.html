@@ -2,6 +2,9 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; base-uri 'none'; object-src 'none'; form-action 'none'" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <title>Data AI Lab @ SNU</title>
@@ -30,7 +33,7 @@
     </style>
   </head>
   <body class="flex flex-col min-h-screen bg-gray-50 text-gray-800">
-    <script src="include-header-footer.js?v=2"></script>
+    <script src="include-header-footer.js?v=3"></script>
 
     <!-- Hero Section -->
     <section class="relative flex hero-bg">
@@ -71,7 +74,7 @@
           <a
             href="https://docs.google.com/document/d/1y0FJLwg7TPy5n7g44G3oxlpssQvSmum8hC6K7vLTfCE/edit?tab=t.0#heading=h.c2h5it991cqf"
             class="underline text-blue-400 hover:text-blue-600"
-            target="_blank"
+            target="_blank" rel="noopener noreferrer"
             >this document</a
           >
           for more information.
@@ -93,36 +96,7 @@
 
     <div id="site-footer"></div>
 
-    <script>
-      // Fetch and render research topics
-      fetch("data/research.json")
-        .then((response) => response.json())
-        .then((research) => {
-          const container = document.getElementById("research-list");
-          // Clear container in case of re-render
-          container.innerHTML = "";
-          research.forEach(({ title, contents, keywords, image }) => {
-            const card = document.createElement("div");
-            card.className =
-              "p-6 bg-white rounded-lg shadow-md flex flex-col gap-4 items-center";
-            card.innerHTML = `
-              <img src="${image}" alt="${title}" class="w-48 h-48 object-cover rounded mt-2 border border-gray-200 bg-gray-100 flex-shrink-0" onerror="this.style.display='none'">
-              <div class="flex-1">
-                <h3 class="text-lg font-semibold mb-2">${title}</h3>
-                <p class="text-sm">${contents}</p>
-                <div class="mt-4 flex flex-wrap gap-2">
-                  ${keywords
-                    .map(
-                      (kw) =>
-                        `<span class='bg-blue-100 text-blue-700 text-xs font-medium px-2 py-1 rounded'>${kw}</span>`
-                    )
-                    .join("")}
-                </div>
-              </div>
-            `;
-            container.appendChild(card);
-          });
-        });
-    </script>
+    <script src="js/site-security.js"></script>
+    <script src="js/research.js"></script>
   </body>
 </html>

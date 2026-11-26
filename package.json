@@ -1,6 +1,12 @@
 {
-  "dependencies": {
-    "@tailwindcss/cli": "^4.1.12",
-    "tailwindcss": "^4.1.12"
+  "private": true,
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.3.5",
+    "tailwindcss": "^4.3.5"
+  },
+  "scripts": {
+    "build:css": "tailwindcss -i css/style.css -o css/output.css",
+    "test": "node --test tests/*.test.cjs",
+    "check:site": "node scripts/check-site.cjs"
   }
 }

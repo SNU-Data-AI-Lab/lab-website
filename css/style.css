@@ -1,4 +1,13 @@
-@import "tailwindcss";
+@import "tailwindcss" source(none);
+@source "../*.html";
+@source "../js/*.js";
+@source "../include-header-footer.js";
+
+/* Preserve the site typography when upgrading the build toolchain. */
+@theme {
+  --font-sans: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
+    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
 
 .hero-bg {
   background: linear-gradient(-45deg, #adad9e, #1e4668, #0a1620);
